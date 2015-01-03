@@ -4,7 +4,7 @@ var data = [
 {
   de: "Waltherplatz",
   it: "Piazza Walther",
-  fav: false,
+  fav: true,
   buses: [
   {line: "11", h: 12, min: 34, de: "Firmian", it: "Firmiano"},
   {line: "6", h: 12, min: 56, de: "Perathonerstraße", it: "Via Perathoner"},
@@ -27,7 +27,7 @@ var data = [
 {
   de: "Walter Tobagi Passage",
   it: "Piazza Walther",
-  fav: false,
+  fav: true,
   buses:
   [
   {line: "11", h: 12, min: 34, de: "Firmian", it: "Firmiano"},
@@ -48,18 +48,30 @@ var BusStops = React.createClass({
 });
 
 var StopList = React.createClass({
+  addFav: function(index) {
+    console.log("Add Fav");
+    this.props.stations[index].fav = true;
+    render();
+  },
+  removeFav: function(index) {
+    console.log("Remove Fav");
+    this.props.stations[index].fav = false;
+    render();
+  },
   render:function(){
-    var stationList = this.props.stations.map(function(station){
+    var stationList = this.props.stations.map(function(station, index){
       return (
         <article className="station expanded">
           <header className="station-header">
             <h1 className="station-title">{station.de}</h1>
-            <button className="station-star star"></button>
+            <button className={(station.fav)? "station-star star": "station-star nostar"}
+                    onClick={(station.fav)? this.removeFav.bind(null, index): this.addFav.bind(null, index)} >
+            </button>
           </header>
           <BusList data={station.buses} />
         </article>
       )
-    });
+    }.bind(this));
 
     return (
       <div>
@@ -101,10 +113,13 @@ var Search = React.createClass({
   }
 });
 
+render();
+function render() {
 React.render(
   <BusStops list={data} />,
   document.getElementById('content')
 );
+}
 
 React.render(
   <Search/>,
