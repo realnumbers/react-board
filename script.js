@@ -2,38 +2,38 @@
 
 var data = [
 {
-  de: "Waltherplatz",
-  it: "Piazza Walther",
-  fav: true,
+  de: 'Waltherplatz',
+  it: 'Piazza Walther',
+  fav: false,
   buses: [
-  {line: "11", h: 12, min: 34, de: "Firmian", it: "Firmiano"},
-  {line: "6", h: 12, min: 56, de: "Perathonerstraße", it: "Via Perathoner"},
-  {line: "4", h: 13, min: 01, de: "Bahnhof Bozen", it: "Stazione Bolzano"},
-  {line: "11", h: 12, min: 14, de: "Firmian", it: "Firmiano"}
+  {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
+  {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
+  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 },
 {
-  de: "Perathoner",
-  it: "Piazza Walther",
+  de: 'Perathoner',
+  it: 'Piazza Walther',
   fav: false,
   buses:
   [
-  {line: "11", h: 12, min: 34, de: "Firmian", it: "Firmiano"},
-  {line: "6", h: 12, min: 56, de: "Perathonerstraße", it: "Via Perathoner"},
-  {line: "4", h: 13, min: 01, de: "Bahnhof Bozen", it: "Stazione Bolzano"},
-  {line: "11", h: 12, min: 14, de: "Firmian", it: "Firmiano"}
+  {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
+  {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
+  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 },
 {
-  de: "Walter Tobagi Passage",
-  it: "Piazza Walther",
+  de: 'Walter Tobagi Passage',
+  it: 'Piazza Walther',
   fav: true,
   buses:
   [
-  {line: "11", h: 12, min: 34, de: "Firmian", it: "Firmiano"},
-  {line: "6", h: 12, min: 56, de: "Perathonerstraße", it: "Via Perathoner"},
-  {line: "4", h: 13, min: 01, de: "Bahnhof Bozen", it: "Stazione Bolzano"},
-  {line: "11", h: 12, min: 14, de: "Firmian", it: "Firmiano"}
+  {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
+  {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
+  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 }];
 
