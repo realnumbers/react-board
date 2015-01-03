@@ -40,7 +40,9 @@ var data = [
 var BusStops = React.createClass({
   render:function(){
     return (
+      <section className="scroll-container">
       <StopList stations={this.props.list} />
+      </section>
     )
   }
 });
@@ -88,7 +90,23 @@ var BusList = React.createClass({
   }
 });
 
+var Search = React.createClass({
+  render:function(){
+  return (
+      <div className="search-container">
+      <input className="search-input" placeholder="Search for bus stops..."></input>
+      <button value="" className="search-button"></button>
+      </div>
+      )
+  }
+});
+
 React.render(
   <BusStops list={data} />,
   document.getElementById('content')
+);
+
+React.render(
+  <Search/>,
+  document.getElementById('search')
 );
