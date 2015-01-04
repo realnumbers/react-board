@@ -1,3 +1,5 @@
+"use strict";
+
 /*** @jsx React.DOM */
 
 var data = [
@@ -8,7 +10,7 @@ var data = [
   buses: [
   {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
   {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
-  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '4', h: 13, min: 11, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
   {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 },
@@ -20,7 +22,7 @@ var data = [
   [
   {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
   {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
-  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '4', h: 13, min: 11, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
   {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 },
@@ -32,7 +34,7 @@ var data = [
   [
   {line: '11', h: 12, min: 34, de: 'Firmian', it: 'Firmiano'},
   {line: '6', h: 12, min: 56, de: 'Perathonerstraße', it: 'Via Perathoner'},
-  {line: '4', h: 13, min: 01, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
+  {line: '4', h: 13, min: 11, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
   {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
 }];
@@ -41,49 +43,52 @@ var BusStops = React.createClass({
   render:function(){
     return (
       <section className="scroll-container">
-      <StopList stations={this.props.list} />
+        <StationList stations={this.props.list} />
       </section>
-    )
+    );
   }
 });
 
-var StopList = React.createClass({
-  addFav: function(index) {
-    console.log("Add Fav");
-    this.props.stations[index].fav = true;
-    render();
-  },
-  removeFav: function(index) {
-    console.log("Remove Fav");
-    this.props.stations[index].fav = false;
-    render();
-  },
+var StationList = React.createClass({
   render:function(){
     var stationList = this.props.stations.map(function(station, index){
       return (
-        <article className="station expanded">
-          <header className="station-header">
-            <h1 className="station-title">{station.de}</h1>
-            <button className={(station.fav)? "station-star star": "station-star nostar"}
-                    onClick={(station.fav)? this.removeFav.bind(null, index): this.addFav.bind(null, index)} >
-            </button>
-          </header>
-          <BusList data={station.buses} />
-        </article>
-      )
+        <Station data="station">
+      );
     }.bind(this));
 
     return (
       <div>
         {stationList}
       </div>
-    )
+    );
   }
 
 });
 
+var Station = React.createClass({
+  getInitialState: function() {
+    return {fav: this.props.fav};
+  },
+  handleClick: function() {
+    this.setState({fav: !this.state.fav});
+  },
+  render: function() {
+    return (
+      <article className="station expanded">
+        <header className="station-header">
+          <h1 className="station-title">{station.de}</h1>
+          <button className={(station.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
+          </button>
+        </header>
+        <BusList data={station.buses} />
+      </article>
+    );
+  }
+});
+
 var BusList = React.createClass({
-  render:function(){
+  render: function() {
     var buses = this.props.data.map(function(bus){
 
       return (
@@ -92,24 +97,24 @@ var BusList = React.createClass({
           <label className="time">{bus.min}</label>
           <label className="endstation">{bus.de}</label>
         </article>
-      )
+      );
     });
     return (
       <section className="bus-list">
         {buses}
       </section>
-    )
+    );
   }
 });
 
 var Search = React.createClass({
-  render:function(){
+  render: function() {
   return (
       <div className="search-container">
       <input className="search-input" placeholder="Search for bus stops..."></input>
       <button value="" className="search-button"></button>
       </div>
-      )
+    );
   }
 });
 
