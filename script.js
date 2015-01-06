@@ -40,7 +40,7 @@ var data = [
 }];
 
 var BusStops = React.createClass({
-  render:function(){
+  render: function(){
     return (
       <section className="scroll-container">
         <StationList stations={this.props.list} />
@@ -50,10 +50,10 @@ var BusStops = React.createClass({
 });
 
 var StationList = React.createClass({
-  render:function(){
+  render: function(){
     var stationList = this.props.stations.map(function(station, index){
       return (
-        <Station data="station">
+        <Station data={station} />
       );
     }.bind(this));
 
@@ -68,20 +68,22 @@ var StationList = React.createClass({
 
 var Station = React.createClass({
   getInitialState: function() {
-    return {fav: this.props.fav};
+    return {fav: this.props.data.fav};
   },
   handleClick: function() {
     this.setState({fav: !this.state.fav});
   },
   render: function() {
+    console.log("yo");
+    console.log(this.props.data.buses);
     return (
       <article className="station expanded">
         <header className="station-header">
-          <h1 className="station-title">{station.de}</h1>
-          <button className={(station.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
+          <h1 className="station-title">{this.props.data.de}</h1>
+          <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
           </button>
         </header>
-        <BusList data={station.buses} />
+        <BusList data={this.props.data.buses} />
       </article>
     );
   }
