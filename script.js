@@ -41,12 +41,20 @@ var data = [
 
 var BusStops = React.createClass({
   render: function(){
-    return (
-      <section className="scroll-container">
-        <StationList stations={this.props.list} />
-      </section>
+    if (this.props.list.length === 0) {
+      return (
+        <section className="scroll-container">
+        </section>
+      );
+      }
+      else {
+        return (
+        <section className="scroll-container">
+          <StationList stations={this.props.list} />
+        </section>
     );
   }
+}
 });
 
 var StationList = React.createClass({
@@ -74,7 +82,6 @@ var Station = React.createClass({
     this.setState({fav: !this.state.fav});
   },
   render: function() {
-    console.log("yo");
     console.log(this.props.data.buses);
     return (
       <article className="station expanded">
@@ -120,13 +127,12 @@ var Search = React.createClass({
   }
 });
 
-render();
-function render() {
+
 React.render(
-  <BusStops list={data} />,
+  <BusStops list={stopsList} />,
   document.getElementById('content')
 );
-}
+
 
 React.render(
   <Search/>,
