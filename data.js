@@ -171,11 +171,11 @@ function jsonp(url, str, callback) {
   var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
   window[callbackName] = function(data) {
     delete window[callbackName];
-    document.body.removeChild(script);
+    document.head.removeChild(script);
     callback(data);
   };
 
   var script = document.createElement('script');
   script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + str + '=' + callbackName;
-  document.body.appendChild(script);
+  document.head.appendChild(script);
 }
