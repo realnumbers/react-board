@@ -127,14 +127,22 @@ var Search = React.createClass({
   }
 });
 
+var Content = React.createClass({
+	render: function() {
+		console.log(this);
+		return(
+				<section id="content">
+					<header id="search" className="header-bar">
+						<Search />
+					</header>
+  				<BusStops list={this.props.data} />
+				</section>
+		);
+	}
+});
+
 
 React.render(
-  <BusStops list={stopsList} />,
-  document.getElementById('content')
-);
-
-
-React.render(
-  <Search/>,
-  document.getElementById('search')
+  <Content data={data} />,
+	document.getElementsByTagName("body")[0]
 );
