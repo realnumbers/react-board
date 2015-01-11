@@ -82,7 +82,7 @@ var Station = React.createClass({
     this.setState({fav: !this.state.fav});
   },
   render: function() {
-    console.log(this.props.data.buses);
+  //  console.log(this.props.data.buses);
     return (
       <article className="station expanded">
         <header className="station-header">
@@ -117,11 +117,16 @@ var BusList = React.createClass({
 });
 
 var Search = React.createClass({
+	handleInput: function(el) {
+		var input = document.getElementById("searchInput").value;
+    this.setState({search: input});
+		//console.log(this);
+	},
   render: function() {
   return (
       <div className="search-container">
-      <input className="search-input" placeholder="Search for bus stops..."></input>
-      <button value="" className="search-button"></button>
+      <input onInput={this.handleInput} id="searchInput" className="search-input" placeholder="Search for bus stops..."></input>
+      <button onClick={this.handleInput} value="" className="search-button"></button>
       </div>
     );
   }

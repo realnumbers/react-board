@@ -119,7 +119,6 @@ function getBusstopList() {
 // callback is the name of the callback arg
 function request(urlAPI, success, callback, index) {
   jsonp(urlAPI, callback, function(data) {
-    console.log(data);
 		success(data, index);
   });
 
