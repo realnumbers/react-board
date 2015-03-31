@@ -1,5 +1,6 @@
 var lang = "it"; // 0 for italian and 1 for german
 var stopsList = getBusstopList();
+var board = {};
 var individualRankings = {
 	//"id": rank,
 	"516": -200
@@ -60,7 +61,7 @@ function parseList(stopsArray) {
 
 
 //match input with busstops name and citys
-function matchInput(list, input) {
+function matchInput(list, input, callback) {
 	var searchTerm = input.split(" ");
 	var matchingElements = [];
 	for (var stop in list) {
@@ -76,7 +77,8 @@ function matchInput(list, input) {
 			matchingElements.push(list[stop]);
 		}
 	}
-	return matchingElements;
+	downloadBoard(stop);
+	callback(matchingElements);
 }
 
 function downloadBoard(id) {

@@ -3,7 +3,7 @@
 /*** @jsx React.DOM */
 
 var data = [
-{
+/*{
   de: 'Waltherplatz',
   it: 'Piazza Walther',
   fav: false,
@@ -37,7 +37,9 @@ var data = [
   {line: '4', h: 13, min: 11, de: 'Bahnhof Bozen', it: 'Stazione Bolzano'},
   {line: '11', h: 12, min: 14, de: 'Firmian', it: 'Firmiano'}
   ]
-}];
+}
+*/
+];
 
 var BusStops = React.createClass({
   render: function(){
@@ -89,7 +91,7 @@ var Station = React.createClass({
     return (
       <article className={(this.state.visible)? "station expanded" : "station"}>
         <header className="station-header">
-          <h1 className="station-title" onClick={this.toggleHandler}>{this.props.data.de}</h1>
+          <h1 className="station-title" onClick={this.toggleHandler}>{this.props.data.name[lang] + " - " + this.props.data.city[lang]}</h1>
           <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
           </button>
         </header>
@@ -123,6 +125,7 @@ var Search = React.createClass({
 	handleInput: function(el) {
 		var input = document.getElementById("searchInput").value;
     this.setState({search: input});
+		matchInput(stopsList, input, render);
 		//console.log(this);
 	},
   render: function() {
@@ -154,7 +157,10 @@ var Content = React.createClass({
 });
 
 
-React.render(
-  <Content data={data} />,
-	document.getElementsByTagName("body")[0]
-);
+render(data);
+function render(data) {
+	React.render(
+  	<Content data={data} />,
+		document.getElementsByTagName("body")[0]
+	);
+}
