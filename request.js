@@ -9,52 +9,53 @@ loadBusstopsList();
 
 //downloadBoard();
 function parseStop(stop) {
-  var res = {};
-  res.city = {};
-  res.name = {};
-  res.ids = [];
+	var res = {};
+	res.city = {};
+	res.name = {};
+	res.ids = [];
 
-  /*  data[i].rank = 0;
-    if (data[i].city[0] === "Bolzano")
-      data[i].rank = 30;
-      else if (data[i].city[0] === "Merano")
-        data[i].rank = 20;
-        else if (data[i].city[0] === "Lana")
-          data[i].rank = 10;
-          if (data[i].stop[0].match(/stazione/gi) !== null)
-            data[i].rank += 20;
-            if (individualRankings[data[i].busstops[0].ORT_NR] !== undefined)
-              data[i].rank = individualRankings[data[i].busstops[0].ORT_NR];
-*/
+	/*  data[i].rank = 0;
+			if (data[i].city[0] === "Bolzano")
+			data[i].rank = 30;
+			else if (data[i].city[0] === "Merano")
+			data[i].rank = 20;
+			else if (data[i].city[0] === "Lana")
+			data[i].rank = 10;
+			if (data[i].stop[0].match(/stazione/gi) !== null)
+			data[i].rank += 20;
+			if (individualRankings[data[i].busstops[0].ORT_NR] !== undefined)
+			data[i].rank = individualRankings[data[i].busstops[0].ORT_NR];
+			*/
 
-  var string = parseString(stop.ORT_GEMEINDE);
-  res.city.de = string[1];
-  res.city.it = string[0];
+	var string = parseString(stop.ORT_GEMEINDE);
+	res.city.de = string[1];
+	res.city.it = string[0];
 
-  var string = parseString(stop.ORT_NAME);
-  res.name.de = string[1];
-  res.name.it = string[0];
-  stop.busstops.forEach( function(el, index) {
-    res.ids[index] = el.ORT_NR;
-  });
-  return res;
+	var string = parseString(stop.ORT_NAME);
+	res.name.de = string[1];
+	res.name.it = string[0];
+	stop.busstops.forEach( function(el, index) {
+		res.ids[index] = el.ORT_NR;
+	});
+	return res;
 }
+
 function mergeDuplicate(data, i) {
-  if (i + 1 < data.length && data[i].ORT_NAME === data[i + 1].ORT_NAME &&
-    data[i].ORT_GEMEINDE === data[i + 1].ORT_GEMEINDE) {
-      data[i].busstops = data[i].busstops.concat(data[i + 1].busstops);
-      data.splice(i + 1, 1);
-    }
+	if (i + 1 < data.length && data[i].ORT_NAME === data[i + 1].ORT_NAME &&
+			data[i].ORT_GEMEINDE === data[i + 1].ORT_GEMEINDE) {
+		data[i].busstops = data[i].busstops.concat(data[i + 1].busstops);
+		data.splice(i + 1, 1);
+	}
 
 }
 
 function parseList(stopsArray) {
-  var stops = {};
-  stopsArray.forEach( function(el, index, array) {
-    mergeDuplicate(array, index);
-    stops[el.busstops[0].ORT_NR] = parseStop(el);
-  });
-  return stops;
+	var stops = {};
+	stopsArray.forEach( function(el, index, array) {
+		mergeDuplicate(array, index);
+		stops[el.busstops[0].ORT_NR] = parseStop(el);
+	});
+	return stops;
 }
 
 
@@ -91,12 +92,10 @@ function formatTime(time) {
 
 function validitySuccess(data) {
 
-	clearLocalStorage();
 	if (!localStorage.version || localStorage.version != data[0].VER_GUELTIGKEIT) {
 		clearLocalStorage();
 		localStorage.version = data[0].VER_GUELTIGKEIT;
 		if (!localStorage.busstops) {
-			//console.log("New Data");
 			var apiUrl = "http://opensasa.info/SASAplandata?type=REC_ORT";
 			request(apiUrl, busstopsSuccess, "jsonp");
 		}
@@ -105,8 +104,8 @@ function validitySuccess(data) {
 }
 
 function busstopsSuccess(data) {
-  //console.log(data);
-  //localStorage.setItem('busstops', JSON.stringify(parseList(data)));
+	//console.log(data);
+	localStorage.setItem('busstops', JSON.stringify(parseList(data)));
 	stopsList = parseList(data);
 }
 
@@ -118,28 +117,13 @@ function getBusstopList() {
 
 // callback is the name of the callback arg
 function request(urlAPI, success, callback, index) {
-  jsonp(urlAPI, callback, function(data) {
+	jsonp(urlAPI, callback, function(data) {
 		success(data, index);
-  });
-
-/*	$.ajax({
-		url: urlAPI,
-		dataType: 'jsonp',
-		jsonp: callback,
-		success: function(data) {
-			//console.log("success: " + urlAPI);
-			success(data, index);
-		},
-		error: function(data) {
-			console.log("Error: " + urlAPI);
-		}
 	});
-
-*/
 }
 
 function parseString(str) {
-  // [0] is italian [1] is german
+	// [0] is italian [1] is german
 	str = str.split("-");
 	str[0] = sanitizeNames(str[0]);
 	str[1] = sanitizeNames(str[1]);
@@ -167,19 +151,19 @@ function sanitizeNames(str) {
 }
 
 function jsonp(url, str, callback) {
-  var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-  window[callbackName] = function(data) {
-    delete window[callbackName];
-    document.head.removeChild(script);
-    callback(data);
-  };
+	var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+	window[callbackName] = function(data) {
+		delete window[callbackName];
+		document.head.removeChild(script);
+		callback(data);
+	};
 
-  var script = document.createElement('script');
-  script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + str + '=' + callbackName;
-  document.head.appendChild(script);
+	var script = document.createElement('script');
+	script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + str + '=' + callbackName;
+	document.head.appendChild(script);
 }
 
 function clearLocalStorage() {
-	localStorage.removeItem(busstops);
-	localStorage.removeItem(version);
+	if (localStorage.busstops)
+		localStorage.removeItem(busstops);
 }
