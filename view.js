@@ -76,21 +76,24 @@ var StationList = React.createClass({
 
 var Station = React.createClass({
   getInitialState: function() {
-    return {fav: this.props.data.fav};
+    return {fav: this.props.data.fav, visible: false};
   },
   handleClick: function() {
     this.setState({fav: !this.state.fav});
   },
+	toggleHandler: function() {
+		this.setState({visible: !this.state.visible});
+	},
   render: function() {
-  //  console.log(this.props.data.buses);
+		var body = (this.state.visible)? <BusList data={this.props.data.buses} /> : "";
     return (
-      <article className="station expanded">
+      <article className={(this.state.visible)? "station expanded" : "station"}>
         <header className="station-header">
-          <h1 className="station-title">{this.props.data.de}</h1>
+          <h1 className="station-title" onClick={this.toggleHandler}>{this.props.data.de}</h1>
           <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
           </button>
         </header>
-        <BusList data={this.props.data.buses} />
+				{body}
       </article>
     );
   }
@@ -135,7 +138,8 @@ var Search = React.createClass({
 var Content = React.createClass({
 	render: function() {
 		console.log(this);
-		return(
+		if (data) {
+			return(
 				<section id="content">
 					<header id="search" className="header-bar">
 						<Search />
@@ -143,6 +147,9 @@ var Content = React.createClass({
   				<BusStops list={this.props.data} />
 				</section>
 		);
+		}
+		else
+			return(<div>Loding...</div>);
 	}
 });
 
