@@ -1,5 +1,5 @@
-var lang = 0; // 0 for italian and 1 for german
-var stopsList = {};
+var lang = "it"; // 0 for italian and 1 for german
+var stopsList = getBusstopList();
 var individualRankings = {
 	//"id": rank,
 	"516": -200
@@ -61,7 +61,22 @@ function parseList(stopsArray) {
 
 //match input with busstops name and citys
 function matchInput(list, input) {
+	var searchTerm = input.split(" ");
+	var matchingElements = [];
+	for (var stop in list) {
+		var found = true;
+		for(var i = 0; i < searchTerm.length && found; i++) {
+			var pattern = new RegExp(searchTerm[i],"ig");
+			found = list[stop].city[lang].match(pattern);
+		if (found === null)
+			found = list[stop].name[lang].match(pattern);
+		}
 
+		if (found !== null) {
+			matchingElements.push(list[stop]);
+		}
+	}
+	return matchingElements;
 }
 
 function downloadBoard(id) {
@@ -111,7 +126,10 @@ function busstopsSuccess(data) {
 
 // Return the busstop list as json which is stored in the localStorage
 function getBusstopList() {
-	return JSON.parse(localStorage.busstops);
+	if(localStorage.busstops)
+		return JSON.parse(localStorage.busstops);
+	else
+		console.error("No data");
 }
 
 
