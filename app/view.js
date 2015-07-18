@@ -1,8 +1,12 @@
+/*** @jsx React.DOM */
+var React = require('react');
+var utils = require('./utils.js');
+
 "use strict";
 
-/*** @jsx React.DOM */
+var lang = "it";
 
-var data = [
+//var data = [
 /*{
   de: 'Waltherplatz',
   it: 'Piazza Walther',
@@ -39,11 +43,16 @@ var data = [
   ]
 }
 */
-];
+//];
 
 var BusStops = React.createClass({
+  getInitialState: function(){
+    return {
+      list: []
+    }
+  },
   render: function(){
-    if (this.props.list.length === 0) {
+    if (this.state.list.length === 0) {
       return (
         <section className="scroll-container">
         </section>
@@ -52,7 +61,7 @@ var BusStops = React.createClass({
       else {
         return (
         <section className="scroll-container">
-          <StationList stations={this.props.list} />
+          <StationList stations={this.state.list} />
         </section>
     );
   }
@@ -124,9 +133,7 @@ var BusList = React.createClass({
 var Search = React.createClass({
 	handleInput: function(el) {
 		var input = document.getElementById("searchInput").value;
-    this.setState({search: input});
-		matchInput(stopsList, input, render);
-		//console.log(this);
+    this.props.handler(input);
 	},
   render: function() {
   return (
@@ -138,29 +145,29 @@ var Search = React.createClass({
   }
 });
 
-var Content = React.createClass({
+var View = React.createClass({
+  handleNewSerach: function(input) {
+      console.log("New State beacause of new serach input");
+      utils.matchInput(input, this.updateData);
+  },
+  updateData: function(data) {
+    this.setState({list: data});
+  }
+  getInitialState: function() {
+    return({
+
+    });
+  },
 	render: function() {
-		console.log(this);
-		if (data) {
 			return(
 				<section id="content">
 					<header id="search" className="header-bar">
-						<Search />
+						<Search handler={this.handleNewSerach} />
 					</header>
-  				<BusStops list={this.props.data} />
+  				<BusStops/>
 				</section>
 		);
-		}
-		else
-			return(<div>Loding...</div>);
 	}
 });
 
-
-render(data);
-function render(data) {
-	React.render(
-  	<Content data={data} />,
-		document.getElementsByTagName("body")[0]
-	);
-}
+module.exports = View;
