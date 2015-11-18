@@ -19,9 +19,10 @@
     "url": ""
   },
   "author": "",
-  "license": "AGPLv3",
-  "bugs": {
-    "url": ""
-  },
-  "homepage": ""
+  "license": "AGPL-3.0",
+  "homepage": "",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
