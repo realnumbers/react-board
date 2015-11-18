@@ -152,11 +152,9 @@ var View = React.createClass({
   },
   updateData: function(data) {
     this.setState({list: data});
-  }
+  },
   getInitialState: function() {
-    return({
-
-    });
+    return({});
   },
 	render: function() {
 			return(

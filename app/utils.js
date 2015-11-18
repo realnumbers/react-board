@@ -1,5 +1,5 @@
 var request = require("./request.js");
-var view = require("./view.js");
+var view = require("./view.jsx");
 
 var lang = "it";
 

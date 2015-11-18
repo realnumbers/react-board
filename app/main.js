@@ -1,6 +1,7 @@
-var request = require("./request.js");
-var View = require("./view.js");
+//var request = require("./request.js");
 var React = require('react');
+var View = require("./view.jsx");
 
-request.loadBusstopsList();
-React.render(<View />, document.body);
+//request.loadBusstopsList();
+React.renderComponent(View(), document.getElementById('content'));
+//React.render(<View />, document.body);
