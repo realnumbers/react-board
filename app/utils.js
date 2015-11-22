@@ -29,7 +29,7 @@ function findSuggests(lang, query, callback) {
       ]
 
       var result = sortzzy.sort(matching, model, fields, {dataOnly: true});
-      callback(result.slice(0, 20));
+      callback(result.slice(0, 5));
     }
     else
       callback([]);
