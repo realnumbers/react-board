@@ -2,6 +2,8 @@ var request = require("./request.js");
 var view = require("./view.jsx");
 var storage = require('./storage.js');
 var sortzzy = require('sortzzy');
+var React = require('react');
+var View = require("./view.jsx");
 
 
 //match input with busstops name and citys
@@ -12,7 +14,7 @@ function findSuggests(lang, query, callback) {
     if (query !== undefined && query !== "") {
       var matching = [];
       for (i in busstopList) {
-        matching.push({name: busstopList[i][lang].name, city: busstopList[i][lang].city, id: i });
+        matching.push({name: busstopList[i][lang].name, city: busstopList[i][lang].city, id: i , fav: busstopList[i].fav});
       }
 
       var model = {
@@ -45,5 +47,32 @@ function l10n(lang, data) {
   return data;
 }
 
+function saveFav(id, state) {
+  console.log("add " + id + " to favs");
+  var stops = storage.busstops.get();
+  stops[id].fav = state; 
+  storage.busstops.save(stops);
+  render();
+}
+
+function getFav(lang) {
+  lang = (lang.substr(0, 2) === "de") ? "de" : "it";
+  var stops = storage.busstops.get();
+  var result = [];
+  for (var s in stops) {
+    if (stops[s].fav === true) 
+        result.push({name: stops[s][lang].name, city: stops[s][lang].city, id: s , fav: stops[s].fav});
+  }
+  return result;
+}
+
+function render(data) {
+  React.render(<View data={data} fav={getFav(navigator.language)} />, document.body);
+}
+
+
+module.exports.render = render;
 module.exports.findSuggests = findSuggests;
 module.exports.l10n = l10n;
+module.exports.saveFav = saveFav;
+module.exports.getFav = getFav;

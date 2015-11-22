@@ -12,22 +12,28 @@ var BusStops = React.createClass({
       list: []
     }
   },
-  render: function(){
-    console.log(this.props.stationboard);
-    var list = this.props.stationboard;
-    if (list.length === 0) {
+  createFav: function() {
+    if (this.props.fav.length > 0) {
       return (
-          <section className="scroll-container">
-          </section>
+          <section>
+          <h1 className="favorites-title">Favorites</h1>
+          <StationList stations={this.props.fav} isFav={"fav"} />
+          </ section>
           );
     }
     else {
       return (
-          <section className="scroll-container">
-          <StationList stations={list} />
-          </section>
+          <section />
           );
     }
+  },
+  render: function(){
+    return (
+        <section className="scroll-container">
+        <StationList stations={this.props.stationboard} isFav={""} />
+        {this.createFav()}
+        </section>
+        );
   }
 });
 
@@ -35,7 +41,7 @@ var StationList = React.createClass({
   render: function(){
     var stationList = this.props.stations.map(function(station, index){
       return (
-          <Station stop={station} />
+          <Station key={station.id + this.props.isFav} stop={station} isFav={this.props.isFav}/>
           );
     }.bind(this));
 
@@ -50,28 +56,37 @@ var StationList = React.createClass({
 
 var Station = React.createClass({
   getInitialState: function() {
-    //return {fav: this.props.data.fav, visible: false};
-    return {fav: false, visible: false};
+    return {fav: this.props.stop.fav, visible: false};
+    //return {fav: false, visible: false};
   },
   handleClick: function() {
+    utils.saveFav(this.props.stop.id, !this.state.fav);
     this.setState({fav: !this.state.fav});
   },
-  toggleHandler: function() {
+  update: function() {
+    request.stationboard(this.props.stop.id, function (data) {
+      data = utils.l10n(navigator.language, data);
+      this.setState({visible: true, stationboard: data});
+      setTimeout(function() {
+        console.log("Update stationboard");
+        if (this.state.visible)
+          this.update();
+      }.bind(this), 60000);
+    }.bind(this));
+  },
+  toggleHandler: function(e) {
     if (!this.state.visible) {
-      request.stationboard(this.props.stop.id, function (data) {
-        data = utils.l10n(navigator.language, data);
-        this.setState({visible: true, stationboard: data});
-      }.bind(this));
+      this.update();
     }
     else
-        this.setState({visible: false});
+      this.setState({visible: false});
   },
   render: function() {
-    var body = (this.state.visible)? <BusList data={this.state.stationboard} /> : "";
+    var body = (this.state.visible)? <BusList isFav={this.props.isFav} data={this.state.stationboard} /> : "";
     return (
         <article className={(this.state.visible)? "station expanded" : "station"}>
-        <header className="station-header">
-        <h1 className="station-title" onClick={this.toggleHandler}>{this.props.stop.name + ", " + this.props.stop.city}</h1>
+        <header className="station-header" onClick={this.toggleHandler}>
+        <h1 className="station-title"> {this.props.stop.name + ", " + this.props.stop.city}</h1>
         <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
         </button>
         </header>
@@ -83,11 +98,12 @@ var Station = React.createClass({
 
 var BusList = React.createClass({
   render: function() {
+    var isFav = this.props.isFav;
     var buses = this.props.data.map(function(bus){
       var time = (new Date(bus.departure)).toLocaleTimeString("it", {hour: '2-digit', minute:'2-digit'})
-      var style = {"backgroundColor": (bus.color)? bus.color: "#BF00FF"};
+        var style = {"backgroundColor": (bus.color)? bus.color: "#BF00FF"};
       return (
-          <article className="bus">
+          <article key={bus.departure + isFav} className="bus">
           <label className="line" style={style}>{bus.number}</label>
           <label className="time">{time}</label>
           <label className="time">{bus.delay}</label>
@@ -123,19 +139,19 @@ var View = React.createClass({
     utils.findSuggests(navigator.language, input, this.updateData);
   },
   updateData: function(data) {
-    console.log("New State beacause of new serach input, data: ", data);
     this.setState({stationboard: data});
   },
   getInitialState: function() {
     return({stationboard: []});
   },
   render: function() {
+    console.log(this.props);
     return(
         <section id="content">
         <header id="search" className="header-bar">
         <Search handler={this.handleNewSerach} />
         </header>
-        <BusStops stationboard={this.state.stationboard} />
+        <BusStops fav={this.props.fav} stationboard={this.state.stationboard} />
         </section>
         );
   }
