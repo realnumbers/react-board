@@ -64,9 +64,10 @@ var Station = React.createClass({
     this.setState({fav: !this.state.fav});
   },
   update: function() {
+    this.setState({loading: true});
     request.stationboard(this.props.stop.id, function (data) {
       data = utils.l10n(navigator.language, data);
-      this.setState({visible: true, stationboard: data});
+      this.setState({loading: false, visible: true, stationboard: data});
       setTimeout(function() {
         console.log("Update stationboard");
         if (this.state.visible)
@@ -83,14 +84,16 @@ var Station = React.createClass({
   },
   render: function() {
     var body = (this.state.visible)? <BusList isFav={this.props.isFav} data={this.state.stationboard} /> : "";
+    var spinner = (this.state.loading)? <img className="spinner" src="img/loading.svg" alt="Loading..." /> : "";
     return (
-        <article className={(this.state.visible)? "station expanded" : "station"}>
+        <article className={(this.state.visible || this.state.loading)? "station expanded" : "station"}>
         <header className="station-header" >
         <h1 className="station-title" onClick={this.toggleHandler} > {this.props.stop.name + ", " + this.props.stop.city}</h1>
         <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
         </button>
         </header>
         {body}
+        {spinner}
         </article>
         );
   }
