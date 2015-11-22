@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "React implementation of stationboard",
   "main": "script.js",
-  "dependencies": {},
+  "dependencies": {
+    "moment": "^2.10.6",
+    "sortzzy": "^0.1.1"
+  },
   "repository": {
     "type": "git",
     "url": ""

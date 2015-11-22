@@ -1,44 +1,49 @@
 var request = require("./request.js");
 var view = require("./view.jsx");
+var storage = require('./storage.js');
+var sortzzy = require('sortzzy');
 
-var lang = "it";
 
 //match input with busstops name and citys
-function matchInput(input, callback) {
-	var list = getBusstopList();
-	var searchTerm = input.split(" ");
-	var matchingElements = [];
-	for (var busStop in list) {
-		var found = true;
-		for(var i = 0; i < searchTerm.length && found; i++) {
-			var pattern = new RegExp(searchTerm[i],"ig");
-			found = list[busStop].city[lang].match(pattern);
-		if (found === null)
-			found = list[busStop].name[lang].match(pattern);
-		}
+function findSuggests(lang, query, callback) {
+  lang = (lang.substr(0, 2) === "de") ? "de" : "it";
+  request.requestStops(function(busstopList) {
+    // Create the model to match against 
+    if (query !== undefined && query !== "") {
+      var matching = [];
+      for (i in busstopList) {
+        matching.push({name: busstopList[i][lang].name, city: busstopList[i][lang].city, id: i });
+      }
 
-		if (found !== null) {
-			matchingElements.push(list[busStop]);
-			request.downloadBoard(busStop);
-		}
-	}
-	console.log("[LOG] matching elemetens", matchingElements);
-	callback(matchingElements);
+      var model = {
+        name: query || "",
+        city: query || ""
+      }
+
+      // Define the fields  
+      var fields = [
+      {name: 'name', type: 'string', weight: 1, options: {ignoreCase: true}},
+      {name: 'city', type: 'string', weight: 1, options: {ignoreCase: true}},
+      ]
+
+      var result = sortzzy.sort(matching, model, fields, {dataOnly: true});
+      callback(result.slice(0, 20));
+    }
+    else
+      callback([]);
+  });
 }
 
-// Return the busstop list as json which is stored in the localStorage
-function getBusstopList() {
-	if(localStorage.busstops)
-		return JSON.parse(localStorage.busstops);
-	else
-		console.error("No data");
+function l10n(lang, data) {
+  lang = (lang.substr(0, 2) === "de") ? "de" : "it";
+  console.log("Use this lang: " + lang);
+  data.forEach(function (bus) {
+    bus.destination = storage.busstops.get(bus.destination)[lang].name + 
+      ", " +
+      storage.busstops.get(bus.destination)[lang].city;
+  });
+  return data;
 }
 
-function clearLocalStorage() {
-	if (localStorage.busstops)
-		localStorage.removeItem(busstops);
-}
-
-module.exports.clearLocalStorage =  clearLocalStorage;
-module.exports.getBusstopList = getBusstopList;
-module.exports.matchInput = matchInput;
+module.exports.findSuggests = findSuggests;
+module.exports.l10n = l10n;

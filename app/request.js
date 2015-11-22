@@ -1,156 +1,83 @@
-var Utils = require("./utils.js");
+//var ws = new WebSocket('ws://sparber.net:62249');
+var storage = require('./storage.js');
+var cbTasks = {};
+var ws;
 
-var lang = "it";
+function startSocket(callback) {
+  ws = new WebSocket('ws://127.0.0.1:8000');
 
-var board = {};
-var individualRankings = {
-	//"id": rank,
-	"516": -200
-};
+  ws.onopen = function (event) {
+    callback();
+  };
 
-function parseStop(stop) {
-	var res = {};
-	res.city = {};
-	res.name = {};
-	res.ids = [];
+  ws.onerror = function (event) {
+    console.log("Got error from websocket", event);
+    //callback(event);
+  };
 
-	/*  data[i].rank = 0;
-			if (data[i].city[0] === "Bolzano")
-			data[i].rank = 30;
-			else if (data[i].city[0] === "Merano")
-			data[i].rank = 20;
-			else if (data[i].city[0] === "Lana")
-			data[i].rank = 10;
-			if (data[i].stop[0].match(/stazione/gi) !== null)
-			data[i].rank += 20;
-			if (individualRankings[data[i].busstops[0].ORT_NR] !== undefined)
-			data[i].rank = individualRankings[data[i].busstops[0].ORT_NR];
-			*/
+  ws.onclose = function (event) {
+    console.log("Websocket got closed, reopen it");
+    ws = new WebSocket('ws://127.0.0.1:8000');
+    //callback(event);
+  }
 
-	var string = parseString(stop.ORT_GEMEINDE);
-	res.city.de = string[1];
-	res.city.it = string[0];
+  ws.onmessage = function(response, flags) {
+    var cbList = {};
+    var data = JSON.parse(response.data);
 
-	var string = parseString(stop.ORT_NAME);
-	res.name.de = string[1];
-	res.name.it = string[0];
-	stop.busstops.forEach( function(el, index) {
-		res.ids[index] = el.ORT_NR;
-	});
-	return res;
+    cbList.busstopResponse = function (id, data) {
+      console.log(data);
+      storage.busstops.save(data);
+      cbTasks[id](data);
+    }
+
+    cbList.stationboardResponse = function (id, data) {
+      console.log(data);
+      cbTasks[id](data);
+    }
+
+    console.log(data);
+    cbList[data.cb](data.id, data.res);
+  }
 }
 
-function mergeDuplicate(data, i) {
-	if (i + 1 < data.length && data[i].ORT_NAME === data[i + 1].ORT_NAME &&
-			data[i].ORT_GEMEINDE === data[i + 1].ORT_GEMEINDE) {
-		data[i].busstops = data[i].busstops.concat(data[i + 1].busstops);
-		data.splice(i + 1, 1);
-	}
-
+//function to request the stationbpard for an stop by id
+function requestBoard(id, cb) {
+  console.log("Request board for: " + id);
+  /*CONNECTING  0   The connection is not yet open.
+    OPEN  1   The connection is open and ready to communicate.
+    CLOSING   2   The connection is in the process of closing.
+    CLOSED  3   The connection is closed or couldn't be opened.
+    */
+  if (ws.readyState == 1) {
+    ws.send(JSON.stringify({call:"stationboardRequest", query:id}));
+    cbTasks[id] = cb;
+  }
+  else
+    console.log("Socket not ready, has state " + ws.readyState)
 }
 
-function parseList(stopsArray) {
-	var stops = {};
-	stopsArray.forEach( function(el, index, array) {
-		mergeDuplicate(array, index);
-		stops[el.busstops[0].ORT_NR] = parseStop(el);
-	});
-	return stops;
+//function to request all busstops to save them in the localstorage for later use
+function requestStops(cb) {
+  console.log("Request all busstops and station and save them to the localstorage");
+  /*CONNECTING  0   The connection is not yet open.
+    OPEN  1   The connection is open and ready to communicate.
+    CLOSING   2   The connection is in the process of closing.
+    CLOSED  3   The connection is closed or couldn't be opened.
+    */
+  if (storage.busstops.get() === undefined) {
+    if (ws.readyState == 1) {
+      ws.send(JSON.stringify({call:"busstopRequest", query: "*"}));
+      cbTasks["*"] = cb;
+    }
+    else
+      console.log("Socket not ready, has state " + ws.readyState)
+  }
+  else {
+    cb(storage.busstops.get());
+  }
 }
 
-function downloadBoard(id) {
-	if (board[id] === undefined) {
-		var apiUrl = "http://stationboard.opensasa.info/?type=jsonp&ORT_NR=" + id;
-		request(apiUrl, stationSuccess, "JSONP", id);
-		board[id] = {};
-		board[id].running = true;
-	}
-}
-
-function stationSuccess(data, id) {
-	board[id].running = false;
-	board[id].rides = data.rides;
-
-}
-
-// cache busstops
-function loadBusstopsList() {
-	//console.log("Start Request");
-	var apiUrl =
-		"http://opensasa.info/SASAplandata/?type=BASIS_VER_GUELTIGKEIT";
-	request(apiUrl, validitySuccess, "jsonp");
-}
-
-function formatTime(time) {
-	return time;
-}
-
-function validitySuccess(data) {
-	if (!localStorage.version || localStorage.version != data[0].VER_GUELTIGKEIT) {
-		Utils.clearLocalStorage();
-		localStorage.version = data[0].VER_GUELTIGKEIT;
-		if (!localStorage.busstops) {
-			var apiUrl = "http://opensasa.info/SASAplandata?type=REC_ORT";
-			request(apiUrl, busstopsSuccess, "jsonp");
-		}
-	}
-}
-
-function busstopsSuccess(data) {
-	//console.log(data);
-	localStorage.setItem('busstops', JSON.stringify(parseList(data)));
-	stopsList = parseList(data);
-}
-
-// callback is the name of the callback arg
-function request(urlAPI, success, callback, index) {
-	jsonp(urlAPI, callback, function(data) {
-		success(data, index);
-	});
-}
-
-function parseString(str) {
-	// [0] is italian [1] is german
-	str = str.split("-");
-	str[0] = sanitizeNames(str[0]);
-	str[1] = sanitizeNames(str[1]);
-	if (str[0] === "")
-		str[0] = str[1];
-	if (str[1] === "")
-		str[1] = str[0];
-	return str;
-}
-
-function sanitizeNames(str) {
-	var re = /^[a-z0-9]+$/i; // alphanumeric chars
-	var i = 0;
-	if (str !== undefined) {
-		while (!re.test(str[i]) && i < str.length) {
-			i++;
-		}
-		var j = str.length - 1;
-		while (!re.test(str[j]) && j >= 0) {
-			j--;
-		}
-		if (i >= str.length) return "";
-		else return str.substring(i, j + 1);
-	} else return "";
-}
-
-function jsonp(url, str, callback) {
-	var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-	window[callbackName] = function(data) {
-		delete window[callbackName];
-		document.head.removeChild(script);
-		callback(data);
-	};
-
-	var script = document.createElement('script');
-	script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + str + '=' + callbackName;
-	document.head.appendChild(script);
-}
-
-module.exports.loadBusstopsList = loadBusstopsList;
-module.exports.downloadBoard = downloadBoard;
-
-module.exports.loadBusstopsList = loadBusstopsList;
+module.exports.start = startSocket;
+module.exports.stationboard = requestBoard;
+module.exports.requestStops = requestStops;
