@@ -99,6 +99,7 @@ var Station = React.createClass({
 var BusList = React.createClass({
   render: function() {
     var isFav = this.props.isFav;
+    if (this.props.data.length > 0) {
     var buses = this.props.data.map(function(bus){
       var time = (new Date(bus.departure)).toLocaleTimeString("it", {hour: '2-digit', minute:'2-digit'})
         var style = {"backgroundColor": (bus.color)? bus.color: "#BF00FF"};
@@ -111,6 +112,9 @@ var BusList = React.createClass({
           </article>
           );
     });
+    }
+    else
+      var buses = <label className="no-connections">No Connections</label>;
     return (
         <section className="bus-list">
         {buses}
