@@ -85,8 +85,8 @@ var Station = React.createClass({
     var body = (this.state.visible)? <BusList isFav={this.props.isFav} data={this.state.stationboard} /> : "";
     return (
         <article className={(this.state.visible)? "station expanded" : "station"}>
-        <header className="station-header" onClick={this.toggleHandler}>
-        <h1 className="station-title"> {this.props.stop.name + ", " + this.props.stop.city}</h1>
+        <header className="station-header" >
+        <h1 className="station-title" onClick={this.toggleHandler} > {this.props.stop.name + ", " + this.props.stop.city}</h1>
         <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
         </button>
         </header>
