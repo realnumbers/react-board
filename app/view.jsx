@@ -59,7 +59,8 @@ var Station = React.createClass({
     return {fav: this.props.stop.fav, visible: false};
     //return {fav: false, visible: false};
   },
-  handleClick: function() {
+  handleClick: function(e) {
+    e.stopPropagation();
     utils.saveFav(this.props.stop.id, !this.state.fav);
     this.setState({fav: !this.state.fav});
   },
@@ -87,8 +88,8 @@ var Station = React.createClass({
     var spinner = (this.state.loading)? <img className="spinner" src="img/loading.svg" alt="Loading..." /> : "";
     return (
         <article className={(this.state.visible || this.state.loading)? "station expanded" : "station"}>
-        <header className="station-header" >
-        <h1 className="station-title" onClick={this.toggleHandler} > {this.props.stop.name + ", " + this.props.stop.city}</h1>
+        <header className="station-header" onClick={this.toggleHandler} >
+        <h1 className="station-title" > {this.props.stop.name + ", " + this.props.stop.city}</h1>
         <button className={(this.state.fav)? "station-star star" : "station-star nostar"} onClick={this.handleClick} >
         </button>
         </header>
