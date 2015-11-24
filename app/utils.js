@@ -2,34 +2,18 @@ var request = require("./request.js");
 var view = require("./view.jsx");
 var storage = require('./storage.js');
 var sortzzy = require('sortzzy');
+var levenshtein = require('fast-levenshtein');
 var React = require('react');
 var View = require("./view.jsx");
+var cache = {};
 
 
 //match input with busstops name and citys
 function findSuggests(lang, query, callback) {
   lang = (lang.substr(0, 2) === "de") ? "de" : "it";
   request.requestStops(function(busstopList) {
-    // Create the model to match against 
     if (query !== undefined && query !== "") {
-      var matching = [];
-      for (i in busstopList) {
-        matching.push({name: busstopList[i][lang].name, city: busstopList[i][lang].city, id: i , fav: busstopList[i].fav});
-      }
-
-      var model = {
-        name: query || "",
-        city: query || ""
-      }
-
-      // Define the fields  
-      var fields = [
-      {name: 'name', type: 'string', weight: 1, options: {ignoreCase: true}},
-      {name: 'city', type: 'string', weight: 1, options: {ignoreCase: true}},
-      ]
-
-      var result = sortzzy.sort(matching, model, fields, {dataOnly: true});
-      callback(result.slice(0, 5));
+      callback(matchInput(busstopList, lang, query));
     }
     else
       callback([]);
@@ -61,7 +45,7 @@ function getFav(lang) {
   var result = [];
   for (var s in stops) {
     if (stops[s].fav === true) 
-        result.push({name: stops[s][lang].name, city: stops[s][lang].city, id: s , fav: stops[s].fav});
+      result.push({name: stops[s][lang].name, city: stops[s][lang].city, id: s , fav: stops[s].fav});
   }
   return result;
 }
@@ -70,6 +54,66 @@ function render(data) {
   React.render(<View data={data} fav={getFav(navigator.language)} />, document.body);
 }
 
+function matchInput(list, lang, query) {
+  console.time("matchTime");
+  var suggests = inputCache(query);
+  var found;
+  var j;
+  if (query !== "") {
+    if (suggests === undefined) {
+      suggests = [];
+      var input = query.split(" ");
+      for (var stop in list) {
+        j = 0;
+        do {
+          found = list[stop][lang].city.match(new RegExp(input[j], "i"));
+          if (found === null)
+            found = list[stop][lang].name.match(new RegExp(input[j], "i"));
+          j++;
+          //continue only if the first word was found
+        } while (j < input.length && found !== null);
+        if (found !== null)
+          suggests[suggests.length] = {name: list[stop][lang].name, city: list[stop][lang].city, id: stop , fav: list[stop].fav};
+        if (suggests.length > 4)
+          break;
+      }
+    }
+    //{name: busstopList[i][lang].name, city: busstopList[i][lang].city, id: i , fav: busstopList[i].fav}
+    inputCache(query, suggests);
+  }
+  else 
+    cache = undefined;
+  console.timeEnd("matchTime");
+  return suggests;
+}
+
+function minDistance() {
+  var matching = [];
+  for (stop in busstopList) {
+    var score = sortzzy.levenshtein.levenshtein(busstopList[stop][lang].name + " " + busstopList[stop][lang].city, query);
+
+    var notInserted = true;
+    for (var i = 0; i < 5 && notInserted; i++) {
+      if (matching[i] === undefined || score < matching[i].score) {
+        var item = {"score": score,
+          "name": busstopList[stop][lang].name,
+          "city": busstopList[stop][lang].city,
+          "id": stop + "-sug",
+          "fav": busstopList[stop].fav};
+        matching.splice(i, 0, item);
+        notInserted = false;
+      }
+    }
+  }
+}
+
+function inputCache(input, suggests) {
+  if (suggests) {
+    cache[input] = suggests;
+  }
+  else
+    return cache[input];
+}
 
 module.exports.render = render;
 module.exports.findSuggests = findSuggests;
