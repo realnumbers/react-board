@@ -4,7 +4,8 @@ var cbTasks = {};
 var ws;
 
 function startSocket(callback) {
-  ws = new WebSocket('ws://127.0.0.1:8000');
+  //ws = new WebSocket('ws://127.0.0.1:8000');
+  ws = new WebSocket('ws://sparber.net:62249');
 
   ws.onopen = function (event) {
     callback();
