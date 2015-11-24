@@ -2,7 +2,7 @@
 var React = require('react');
 var utils = require('./utils.js');
 var request = require('./request.js');
-var moment = require('moment');
+//var moment = require('moment');
 
 "use strict";
 
