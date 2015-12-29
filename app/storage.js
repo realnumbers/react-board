@@ -18,7 +18,7 @@ catch (e) {
 }
 
 function saveStorage() {
-  localstorage.storage = JSON.stringify(storage);
+  localStorage.storage = JSON.stringify(storage);
 }
 
 function getBusstops(id, callback) {
@@ -41,7 +41,7 @@ function getBusstops(id, callback) {
 }
 
 function getFavorites(id, callback) {
-  if (storage.favorites !=== undefined) {
+  if (storage.favorites !== undefined) {
     if(id === "*")
       callback(storage.favorites);
     else
@@ -78,6 +78,6 @@ module.exports.busstops = {};
 module.exports.busstops.get = getBusstops;
 module.exports.favorites  = {};
 module.exports.favorites.get = getFavorites;
-module.exports.favorites.remove = revomeFavorites;
+module.exports.favorites.remove = removeFavorites;
 module.exports.stationboard = {};
 module.exports.stationboard.get = getStationboard;
