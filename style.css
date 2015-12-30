@@ -200,6 +200,7 @@ input, input:hover, input:focus, input:active {
   background-color: blue;
   color: white;
   border-radius: 0.3em;
+  width: 4em;
 }
 .time {
   font-size: 1.1em;
