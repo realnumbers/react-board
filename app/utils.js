@@ -24,9 +24,14 @@ function l10n(lang, data) {
   lang = (lang.substr(0, 2) === "de") ? "de" : "it";
   console.log("Use this lang: " + lang);
   data.forEach(function (bus) {
+    console.log(bus.destination);
+    if (bus.destination !== undefined) {
     bus.destination = storage.busstops.get(bus.destination)[lang].name + 
       ", " +
       storage.busstops.get(bus.destination)[lang].city;
+    }
+    else
+      bus.destination = "[error destination]";
   });
   return data;
 }

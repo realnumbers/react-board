@@ -17,7 +17,7 @@ var BusStops = React.createClass({
           <section>
           <h1 className="favorites-title">Favorites</h1>
           <StationList stations={this.props.fav} isFav={"fav"} />
-          </ section>
+          </section>
           );
     }
     else {
