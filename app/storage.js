@@ -7,7 +7,7 @@ catch (e) {
 
 function getBusstops(id) {
   if(id && busstopList)
-    return busstopList[id];
+    return busstopList[id] || {};
   else
     return busstopList;
 }
