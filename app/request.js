@@ -44,38 +44,51 @@ function startSocket(callback) {
 
 //function to request the stationbpard for an stop by id
 function requestBoard(id, cb) {
-  console.log("Request board for: " + id);
-  /*CONNECTING  0   The connection is not yet open.
-    OPEN  1   The connection is open and ready to communicate.
-    CLOSING   2   The connection is in the process of closing.
-    CLOSED  3   The connection is closed or couldn't be opened.
-    */
-  if (ws.readyState == 1) {
-    ws.send(JSON.stringify({call:"stationboardRequest", query:id}));
-    cbTasks[id] = cb;
-  }
+  if (ws === undefined)
+    startSocket(next);
   else
-    console.log("Socket not ready, has state " + ws.readyState)
-}
-
-//function to request all busstops to save them in the localstorage for later use
-function requestStops(cb) {
-  console.log("Request all busstops and station and save them to the localstorage");
-  /*CONNECTING  0   The connection is not yet open.
-    OPEN  1   The connection is open and ready to communicate.
-    CLOSING   2   The connection is in the process of closing.
-    CLOSED  3   The connection is closed or couldn't be opened.
-    */
-  if (storage.busstops.get() === undefined) {
+    next();
+  function next() {
+    console.log("Request board for: " + id);
+    /*CONNECTING  0   The connection is not yet open.
+      OPEN  1   The connection is open and ready to communicate.
+      CLOSING   2   The connection is in the process of closing.
+      CLOSED  3   The connection is closed or couldn't be opened.
+      */
     if (ws.readyState == 1) {
-      ws.send(JSON.stringify({call:"busstopRequest", query: "*"}));
-      cbTasks["*"] = cb;
+      ws.send(JSON.stringify({call:"stationboardRequest", query:id}));
+      cbTasks[id] = cb;
     }
     else
       console.log("Socket not ready, has state " + ws.readyState)
   }
-  else {
-    cb(storage.busstops.get());
+}
+
+//function to request all busstops to save them in the localstorage for later use
+function requestStops(cb) {
+  if (ws === undefined)
+    startSocket(next);
+  else
+    next();
+
+  function next() {
+    console.log("Request all busstops and station and save them to the localstorage");
+    /*CONNECTING  0   The connection is not yet open.
+      OPEN  1   The connection is open and ready to communicate.
+      CLOSING   2   The connection is in the process of closing.
+      CLOSED  3   The connection is closed or couldn't be opened.
+      */
+    if (storage.busstops.get() === undefined) {
+      if (ws.readyState == 1) {
+        ws.send(JSON.stringify({call:"busstopRequest", query: "*"}));
+        cbTasks["*"] = cb;
+      }
+      else
+        console.log("Socket not ready, has state " + ws.readyState)
+    }
+    else {
+      cb(storage.busstops.get());
+    }
   }
 }
 

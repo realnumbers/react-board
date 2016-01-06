@@ -14,10 +14,13 @@ catch (e) {
   storage.stationboard = undefined;
   storage.favorites = undefined;
   storage.busstops = undefined;
+  storage.suggests = undefined;
   saveStorage();
 }
 
 function saveStorage() {
+  //don't save suggests cache and clear it
+  storage.suggests = undefined;
   localStorage.storage = JSON.stringify(storage);
 }
 
@@ -29,7 +32,7 @@ function getBusstops(id, callback) {
       callback(storage.busstops[id]);
   }
   else {
-    request.busstops(function (data) {
+    request.requestStops(function (data) {
       storage.busstops = data;
       if(id === "*")
         callback(storage.busstops);
@@ -48,13 +51,19 @@ function getFavorites(id, callback) {
       callback(storage.favorites[id]);
   }
   else {
-    callback({});
+    callback();
   }
 }
 
 function removeFavorites(id, callback) {
   delete storage.favorites[id];
   saveStorage();
+}
+
+function addFavorites(id, callback) {
+  getBusstops(id, function (stop) {
+    storage.favorites[id] = stop;
+  });
 }
 
 function getStationboard(id, callback)  {
@@ -73,11 +82,32 @@ function getStationboard(id, callback)  {
       }
 }
 
+function getSuggests(id, callback) {
+  if (storage.suggests !== undefined) {
+    if(id === "*")
+      callback(storage.suggests);
+    else
+      callback(storage.suggests[id]);
+  }
+  else {
+    callback();
+  }
+}
+
+//save suggests for a input string
+function saveSuggests(id, s, callback) {
+  storage.suggests[id] = s;
+}
+
 
 module.exports.busstops = {};
 module.exports.busstops.get = getBusstops;
 module.exports.favorites  = {};
 module.exports.favorites.get = getFavorites;
+module.exports.favorites.add = addFavorites;
 module.exports.favorites.remove = removeFavorites;
 module.exports.stationboard = {};
 module.exports.stationboard.get = getStationboard;
+module.exports.suggests = {};
+module.exports.suggests.get = getSuggests;
+module.exports.suggests.save = saveSuggests;

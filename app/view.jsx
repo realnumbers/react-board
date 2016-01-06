@@ -89,6 +89,7 @@ var View = React.createClass({
     utils.findSuggests(navigator.language, input);
   },
   render: function() {
+    console.log(this.props);
     return(
       <section id="content">
         <header id="search" className="header-bar">
@@ -97,7 +98,7 @@ var View = React.createClass({
         <section className="scroll-container">
           <StationList content={this.props.stationboard} />
           <h1 className="favorites-title">Favorites</h1>
-          <StationList content={this.props.fav} />
+          <StationList content={this.props.favorites} />
         </section>
       </section>
     );
