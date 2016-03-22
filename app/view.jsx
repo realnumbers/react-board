@@ -107,7 +107,7 @@ var BusList = React.createClass({
       var time = (new Date(bus.departure)).toLocaleTimeString("it", {hour: '2-digit', minute:'2-digit'})
         var style = {"backgroundColor": (bus.color)? bus.color: "#BF00FF"};
       return (
-          <article key={bus.departure + isFav} className="bus">
+          <article key={JSON.stringify(bus) + "isFav=" + isFav} className="bus">
           <label className="line" style={style}>{bus.number}</label>
           <label className="time">{time}</label>
           <label className="time">{bus.delay}</label>
@@ -115,9 +115,11 @@ var BusList = React.createClass({
           </article>
           );
     });
+    //add more connection btn
+    var buses = <section>{buses} <LoadMore/> </section>;
     }
     else
-      var buses = <label className="no-connections">No Connections</label>;
+      var buses = <article className="no-connections">No Connections</article>;
     return (
         <section className="bus-list">
         {buses}
@@ -126,6 +128,15 @@ var BusList = React.createClass({
   }
 });
 
+var LoadMore = React.createClass({
+  requestMore: function (e) {
+    e.stopPropagation();
+    console.log("Not yet supported");
+  },
+  render: function () {
+    return <article onClick={this.requestMore} className="more-btn">Load more</article>
+  }
+});
 var Search = React.createClass({
   handleInput: function(el) {
     var input = document.getElementById("searchInput").value;

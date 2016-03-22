@@ -220,6 +220,10 @@ input, input:hover, input:focus, input:active {
   margin: 0 0 0 0.7em;
 }
 
+.more-btn {
+  text-align: center;
+}
+
 /* FOOTER */
 .footer {
   width: 96%;
