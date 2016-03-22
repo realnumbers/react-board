@@ -107,7 +107,7 @@ var BusList = React.createClass({
       var time = (new Date(bus.departure)).toLocaleTimeString("it", {hour: '2-digit', minute:'2-digit'})
         var style = {"backgroundColor": (bus.color)? bus.color: "#BF00FF"};
       return (
-          <article key={bus.departure + isFav} className="bus">
+          <article key={JSON.stringify(bus) + "isFav=" + isFav} className="bus">
           <label className="line" style={style}>{bus.number}</label>
           <label className="time">{time}</label>
           <label className="time">{bus.delay}</label>
